@@ -1,0 +1,102 @@
+<%- include("partials/header") %>
+
+<!-- Content -->
+<div class="container mx-auto">
+  <h1 class="font-signika text-4xl pt-10 pb-8">GALLERY EDIT</h1>
+  <section>
+    <div class="container">
+      <div class="flex flex-wrap">
+        <div class="w-1/2 p-4">
+          <h1 class="text-1xl pt-10 pb-8">About Me Picture</h1>
+          <img src="<%= aboutMeAlbum[aboutMeAlbum.length - 1].imageUrl %>" alt="Image 1" class="image">
+          <div class="p-5">
+            <input type="file" class="fileInput" accept="image/*" style="display: none;">
+            <button class="uploadButton py-3 px-5 text-sm font-medium text-center bg-black dark:bg-white text-white dark:text-black rounded-lg bg-primary-700 sm:w-fit hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+            >Change Picture</button>
+            <input type="hidden" class="albumName" value="<%= aboutMeAlbum[aboutMeAlbum.length - 1].albumName %>">
+          </div>
+        </div>
+        <!-- Second image and button pair -->
+        <div class="w-1/2 p-4">
+          <h1 class="text-1xl pt-10 pb-8">Contact Picture</h1>
+          <img src="<%= contactAlbum[contactAlbum.length - 1].imageUrl %>" alt="Image 2" class="image">
+          <div class="p-5">
+            <input type="file" class="fileInput" accept="image/*" style="display: none;">
+            <button class="uploadButton py-3 px-5 text-sm font-medium text-center bg-black dark:bg-white text-white dark:text-black rounded-lg bg-primary-700 sm:w-fit hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+            >Change Picture</button>
+            <input type="hidden" class="albumName" value="<%= contactAlbum[aboutMeAlbum.length - 1].albumName%>">
+          </div>
+        </div>
+        <!-- Add more image and button pairs as needed -->
+      </div>
+    </div>
+  </section>
+
+
+  <% albums.forEach(album => { %>
+    <h1 class="text-3xl pt-10 pb-8"><%= album.name %></h1>
+    <section class="image-gallery-edit nature-section">
+      <% album.images.forEach(function(image){ %>
+      <div class="gallery-edit-item">
+        <div class="image-edit-container">
+          <img alt="" class="thumbnail" src="<%= image.url %>" />
+          <button class="edit-delete-button" data-album-name="<%= album.name %>" data-image-name="<%= image.name %>">x</button>
+        </div>
+      </div>
+      <% }) %>
+      <div class="add-button-container">
+        <input type="file" class="fileInput" accept="image/*" style="display: none;">
+        <button class="add-button uploadButton">
+          <svg class="h-16 w-16 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>   
+        </button>
+        <!-- Hidden input to store the album name -->
+        <input type="hidden" class="albumName" value="<%= album.name %>">
+      </div>
+    </section>
+  <% }) %>
+
+  <section id="reviews" class="relative flex flex-col overflow-hidden mt-20 pb-10 sliding-section">
+      <h1 class="font-signika text-2xl md:text-4xl pb-10">Reviews</h1>
+      <div class="flex overflow-x-auto">
+          <div class="flex space-x-10 pb-4 mr-4 ml-2">
+              <% reviews.forEach((review) => { %>
+              <div class="card flex flex-col justify-between relative">
+                  <!-- Delete button -->
+                  <button class="delete-review absolute top-0 right-0 bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-600 transition duration-300" onclick="deleteReview('<%= review.name %>')" data-review-id="<%= review._id %>">Delete</button>
+                  
+                  <p class=' font-black text-5xl'>"</p>
+                  <p class='tracking-wider text-sm mt-1 overflow-hidden'><%= review.review %></p>
+                  <div class='mt-1'>
+                      <p class='font-medium text-m mb-auto'>
+                          <span class='blue-text-gradient' style="color: rgb(51, 51, 218);"><i>@</i></span> <%= review.name %>
+                      </p>
+                  </div>
+              </div>
+              <% }) %>
+          </div>
+      </div>
+  </section>
+  
+
+
+
+  <div class="add-button-container flex flex-col">
+    <h1 class="text-3xl pt-10 pb-8 pr-8 flex-col">Add Ablum:</h1> 
+    <div class="flex flex-row">
+      <input type="text" class="albumName" style="background-color: gray; border-radius: 10px;" value=""> 
+      <input type="file" class="fileInput" accept="image/*" style="display: none;">
+      <button class="add-button uploadButton">
+        <svg class="h-16 w-16 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>   
+      </button>
+    </div>
+    
+    <!-- Hidden input to store the album name -->
+    
+  </div>
+  
+<!-- Footer -->
+<%- include("partials/footer") %>

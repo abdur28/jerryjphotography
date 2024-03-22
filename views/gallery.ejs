@@ -1,0 +1,57 @@
+<%- include("partials/header") %>
+
+<div class="container mx-auto">
+  <h1 class="font-signika text-4xl pt-10 pb-8">GALLERY</h1>
+
+  <!-- Album Menu -->
+  <div class="alime-projects-menu flex justify-center mb-8">
+    <div class="portfolio-menu flex overflow-x-scroll pb-10 hide-scroll-bar">
+      <button class="btn active mr-4" data-filter="all">All</button>
+      <!-- You can dynamically generate buttons based on your albums here -->
+      <% albums.forEach(album => { %>
+        <button class="title-case btn mr-4" data-filter="<%= album.name %>"><%= album.name %></button>
+      <% }) %>
+    </div>
+  </div>
+
+  <!-- Albums -->
+  <div id="gallery-container">
+    <% albums.forEach(album => { %>  
+      <section id='<%= album.name %>' class="gallery-section hidden text-neutral-700">
+        <h1 class="title-case font-signika text-3xl pt-10 pb-8"><%= album.name %></h1>
+        <div class="container w-full">
+          <div class="flex flex-wrap justify-start">
+            <% album.images.forEach(image => { %>  
+              <div class="my-image flex-grow p-2">
+                <a href="<%= image.url %>" data-fancybox="<%= album.name %>">
+                  <div class="loader-container"><div class="loader"></div></div>
+                  <img loading="lazy" alt="" class="hidden image-loading all-images border-radius block h-full w-full object-cover object-center opacity-0 animate-fade-in transition duration-500 transform scale-100 hover:scale-110" src="<%= image.url %>" onload="imageLoaded(this)" />
+                </a>
+              </div>
+            <% }); %>
+          </div>
+        </div>
+      </section>
+    <% }) %>
+  </div>
+
+  <div id="all-container">
+      <section id='all' class="gallery-section text-neutral-700">
+        <h1 class="font-signika text-3xl pt-10 pb-8">All</h1>
+        <div class="container w-full">
+          <div class="flex flex-wrap justify-start">
+              <% images.forEach(image => { %>  
+              <div class="my-image flex-grow p-2">
+                <a href="<%= image.imageUrl%>" data-fancybox="all">
+                  <div class="loader-container"><div class="loader"></div></div>
+                  <img alt="" class="hidden all-images image-loading border-radius block h-full w-full object-cover object-center opacity-0 animate-fade-in transition duration-500 transform scale-100 hover:scale-110" src="<%= image.imageUrl %>" onload="imageLoaded(this)" />
+                </a>
+              </div>
+              <% }) %>
+          </div>
+        </div>
+      </section>
+  </div>
+</div>
+
+<%- include("partials/footer") %>
