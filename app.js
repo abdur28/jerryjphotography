@@ -106,9 +106,13 @@ async function fetchAllImagesFromFirebaseStorage() {
 
             const [albumName, imageName] = name.split('/');
 
+            const expirationDate = new Date();
+            expirationDate.setDate(expirationDate.getDate() + 1);
+            expirationDate.setUTCHours(0, 0, 0, 0);
+
             const imageUrl = await file.getSignedUrl({
                 action: 'read',
-                expires: '2024-03-25T12:00:00Z'
+                expires: expirationDate.toISOString() 
             });
 
             return { albumName, imageName, imageUrl };
