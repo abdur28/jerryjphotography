@@ -71,20 +71,28 @@
         <h1 class="font-signika text-1xl text-neutral-700">WHAT OTHERS SAY</h1>
         <h1 class="font-signika text-2xl md:text-4xl pb-10">Reviews</h1>
         <div class="flex overflow-x-auto">
-          <div class="flex space-x-10 pb-4 mr-4 ml-2">
-            <% reviews.forEach((review) => { %>
-            <div class="card flex flex-col justify-between">
-              <p class=' font-black text-5xl'>"</p>
-              <p class='tracking-wider text-sm mt-1 overflow-hidden'><%=review.review%></p>
-              <div class='mt-1'>
-                <p class='font-medium text-m mb-auto'>
-                  <span class='blue-text-gradient' style="color: rgb(51, 51, 218);"><i>@</i></span> <%= review.name %>
-                </p>
-              </div>
+            <div class="flex space-x-10 pb-4 mr-4 ml-2">
+                <% reviews.forEach((review) => { %>
+                    <div class="card flex flex-col justify-between">
+                        <div class="review-img-container justify-center">
+                            <% const reviewImage = reviewImages.find(image => image.imageName === (review.id + '.jpg')); %>
+                            <% if (reviewImage) { %>
+                                <img id="reviewImg" class="review-img" src="<%= reviewImage.imageUrl %>" alt="review image">
+                            <% } else { %>
+                                <img id="reviewImg" class="review-img" src="../dist/assets/user-placeholder.png" alt="placeholder image">
+                            <% } %>
+                        </div>
+                        <p class='tracking-wider text-xs mt-1 overflow-hidden'>"<%= review.review %>"</p>
+                        <div class='mt-1'>
+                            <p class='font-medium text-sm mb-auto'>
+                                <span class='blue-text-gradient' style="color: rgb(51, 51, 218);"><i>@</i></span> <%= review.name %>
+                            </p>
+                        </div>
+                    </div>
+                <% }) %>
             </div>
-            <% }) %>
-          </div>
         </div>
+
         <div class="flex flex-row justify-center items-center pt-10">
           <button class="send-button review-button">
               <p class="send-text">Add a Review</p>
@@ -96,7 +104,32 @@
         <div id="modal-overlay">
           <div id="review-form" class="modal card dark:bg-black bg-white">
             <!-- Your review form content goes here -->
-            <form id="reviewForm" method="post" enctype="application/x-www-form-urlencoded" class=" flex flex-col p-2 mt-4 gap-2">
+            <form id="reviewForm" method="post" enctype="multipart/form-data" class="flex flex-col p-2 mt-4 gap-2">
+              <div class="flex">
+                <img class="review-img review-img-add flex-col" src="../dist/assets/image-placeholder.png" alt="review image">
+                <input type="file" class="reviewFileInput" accept="image/*" style="display: none;">
+                <!-- <button  class="flex-col pl-10 pt-10">Add image</button> -->
+                <button
+                  id="add-review-img"
+                  title="Add New"
+                  class="ml-10 add-review-img group cursor-pointer outline-none hover:rotate-90 duration-300"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="40px"
+                    height="40px"
+                    viewBox="0 0 24 24"
+                    class="stroke-zinc-400 fill-none group-hover:fill-zinc-800 group-active:stroke-zinc-200 group-active:fill-zinc-600 group-active:duration-0 duration-300"
+                  >
+                    <path
+                      d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22Z"
+                      stroke-width="1.5"
+                    ></path>
+                    <path d="M8 12H16" stroke-width="1.5"></path>
+                    <path d="M12 16V8" stroke-width="1.5"></path>
+                  </svg>
+                </button>
+              </div>
               <label for="review-name">Your Name:</label>
               <input id="review-name" type="text" name="name" class="review-input" maxlength="30" required>
               <label for="review">Your Review:</label>
@@ -107,6 +140,7 @@
             <button id="close-modal" class="close">Close</button>
           </div>
         </div>
+        
        
       </section>
       
