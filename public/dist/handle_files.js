@@ -30,22 +30,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Function to handle file input change
   fileInput.addEventListener('change', function () {
-      const file = this.files[0];
+    const file = this.files[0];
 
-      if (file) {
-          const reader = new FileReader();
+    if (file) {
+      const reader = new FileReader();
 
-          reader.onload = function (e) {
-              reviewImg.src = e.target.result;
-          }
-
-          reader.readAsDataURL(file);
+      reader.onload = function (e) {
+        reviewImg.src = e.target.result;
       }
+
+      reader.readAsDataURL(file);
+    }
   });
 
   // Function to handle click on add review image button
   addReviewImgBtn.addEventListener('click', function () {
-      fileInput.click();
+    fileInput.click();
   });
 
   reviewForm.addEventListener('submit', async function (event) {
@@ -63,24 +63,32 @@ document.addEventListener('DOMContentLoaded', function () {
     formData.append("name", name);
     formData.append("review", review);
 
-    try {
-        const response = await fetch('/', {
-            method: 'POST',
-            body: formData
-        });
+    // Change the submit button text to "Submitting..."
+    const submitButton = reviewForm.querySelector('button[type="submit"]');
+    submitButton.textContent = 'Submitting...';
 
-        if (response.ok) {
-            console.log('Review submitted successfully');
-            alert('Thank You for your review.');
-            window.location.reload();
-        } else {
-            console.error('Failed to submit review');
-        }
+    try {
+      const response = await fetch('/', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        console.log('Review submitted successfully');
+        alert('Thank You for your review.');
+        window.location.reload();
+      } else {
+        console.error('Failed to submit review');
+      }
     } catch (error) {
-        console.error('Error submitting review:', error);
+      console.error('Error submitting review:', error);
+    } finally {
+      // Revert the submit button text back to "Submit Review"
+      submitButton.textContent = 'Submit Review';
     }
   });
 });
+
 
 
 document.addEventListener('DOMContentLoaded', function() {
