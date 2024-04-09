@@ -22,15 +22,82 @@ document.querySelectorAll('.edit-delete-button').forEach(button => {
   });
 });
 
+document.addEventListener('DOMContentLoaded', function () {
+  const addReviewImgBtn = document.getElementById('add-review-img');
+  const fileInput = document.querySelector('.reviewFileInput');
+  const reviewImg = document.querySelector('.review-img-add');
+  const reviewForm = document.getElementById('reviewForm');
+
+  // Function to handle file input change
+  fileInput.addEventListener('change', function () {
+      const file = this.files[0];
+
+      if (file) {
+          const reader = new FileReader();
+
+          reader.onload = function (e) {
+              reviewImg.src = e.target.result;
+          }
+
+          reader.readAsDataURL(file);
+      }
+  });
+
+  // Function to handle click on add review image button
+  addReviewImgBtn.addEventListener('click', function () {
+      fileInput.click();
+  });
+
+  reviewForm.addEventListener('submit', async function (event) {
+    event.preventDefault();
+
+    // Retrieve name and review from form inputs
+    const name = document.getElementById('review-name').value;
+    const review = document.getElementById('review').value;
+    const file = fileInput.files[0];
+
+    const formData = new FormData();
+    if (file) {
+      formData.append("file", file);
+    }
+    formData.append("name", name);
+    formData.append("review", review);
+
+    try {
+        const response = await fetch('/', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            console.log('Review submitted successfully');
+            alert('Thank You for your review.');
+            window.location.reload();
+        } else {
+            console.error('Failed to submit review');
+        }
+    } catch (error) {
+        console.error('Error submitting review:', error);
+    }
+  });
+});
+
+
 document.addEventListener('DOMContentLoaded', function() {
   // Add event listener to all delete buttons
   const deleteButtons = document.querySelectorAll('.delete-review');
   deleteButtons.forEach(deleteButton => {
     deleteButton.addEventListener('click', async () => {
-      const reviewId = deleteButton.dataset.reviewId;
+      // Confirm deletion with the user
+      const confirmation = confirm('Are you sure you want to delete this review?');
+      if (!confirmation) return; // If user cancels, do nothing
 
+      const reviewId = deleteButton.dataset.reviewId;
+      const imagePresent = deleteButton.parentElement.querySelector('.ImagePresent').value; // Get the value of the input element
+
+      console.log(imagePresent)
       try {
-        const response = await fetch(`/delete-review/${reviewId}`, {
+        const response = await fetch(`/delete-review/${reviewId}/${imagePresent}`, {
           method: 'DELETE'
         });
         if (response.ok) {
@@ -47,6 +114,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+
+
 
 
 
