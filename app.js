@@ -236,7 +236,7 @@ app.post('/', upload.single('file'), async (req, res) => {
 
             console.log("Uploaded to Firebase Storage");
         }
-        
+        await redisClient.flushDb();
         res.redirect('/')
     } catch (error) {
         console.error('Error saving review:', error);
