@@ -62,25 +62,29 @@
       <div class="flex overflow-x-auto">
           <div class="flex space-x-10 pb-4 mr-4 ml-2">
               <% reviews.forEach((review) => { %>
-              <div class="card flex flex-col justify-between relative">
-                  <!-- Delete button -->
-                  <button class="delete-review absolute top-0 right-0 bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-600 transition duration-300" onclick="deleteReview('<%= review.name %>')" data-review-id="<%= review._id %>">Delete</button>
-                  
-                  <p class=' font-black text-5xl'>"</p>
-                  <p class='tracking-wider text-sm mt-1 overflow-hidden'><%= review.review %></p>
+                <div class="card flex flex-col justify-between">
+                  <button class="ml-40 delete-review  top-0 right-0 bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-600 transition duration-300" onclick="deleteReview('<%= review.name %>')" data-review-id="<%= review._id %>">X</button>
+                  <div class="review-img-container justify-center">
+                      <% const reviewImage = reviewImages.find(image => image.imageName === (review.id + '.jpg')); %>
+                      <% if (reviewImage) { %>
+                        <input id="reviewImg" type="hidden" class="ImagePresent" value="true">
+                        <img class="review-img" src="<%= reviewImage.imageUrl %>" alt="review image">
+                      <% } else { %>
+                        <input id="reviewImg" type="hidden" class="ImagePresent" value="false">
+                        <img class="review-img" src="../dist/assets/user-placeholder.png" alt="placeholder image">
+                      <% } %>
+                  </div>
+                  <p class='tracking-wider text-xs mt-1 overflow-hidden'>"<%= review.review %>"</p>
                   <div class='mt-1'>
-                      <p class='font-medium text-m mb-auto'>
+                      <p class='font-medium text-sm mb-auto'>
                           <span class='blue-text-gradient' style="color: rgb(51, 51, 218);"><i>@</i></span> <%= review.name %>
                       </p>
                   </div>
-              </div>
+                </div>
               <% }) %>
           </div>
       </div>
   </section>
-  
-
-
 
   <div class="add-button-container flex flex-col">
     <h1 class="text-3xl pt-10 pb-8 pr-8 flex-col">Add Ablum:</h1> 
