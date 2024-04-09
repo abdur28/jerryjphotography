@@ -189,20 +189,19 @@ function shuffleArray(array) {
 
 app.get('/', async (req, res) => {
     try {
-        await redisClient.flushDb()
         const allImages = await fetchAndCacheImages();
-        const filteredImages = allImages.filter(image => image.albumName !== 'contact' && image.albumName !== 'about_me');
-
+        const filteredImages = allImages.filter(image => image.albumName === 'highlights');
+        const reviewImages = allImages.filter(image => image.albumName === 'reviews');
         const shuffledImages = shuffleArray(filteredImages);
 
-        res.render('index', { images: shuffledImages, adminInfo: res.locals.adminInfo, reviews: res.locals.reviews });
+        res.render('index', { images: shuffledImages, reviewImages: reviewImages, adminInfo: res.locals.adminInfo, reviews: res.locals.reviews });
     } catch (error) {
         console.error('Error fetching images:', error);
         res.status(500).send('Error fetching images');
     }
 });
 
-app.post('/', async (req, res) => {
+app.post('/', upload.single('file'), async (req, res) => {
     try {
         const { name, review } = req.body;
         const reviewCard = new Review({
@@ -210,18 +209,60 @@ app.post('/', async (req, res) => {
             review: review
         });
 
-        await reviewCard.save();
+        const savedReview = await reviewCard.save();
 
-        res.redirect('/');
+        const file = req.file;
+        if (!file) {
+            return res.redirect('/');
+        }
+
+        if (savedReview.id){
+            let fileName = savedReview.id;
+            // Resize and optimize image with quality 90 using Sharp
+            const optimizedImageBuffer = await sharp(file.buffer)
+            .jpeg({ quality: 90 })
+            .toBuffer();
+
+            // Upload the image to Firebase Storage
+            const bucket = admin.storage().bucket();
+            const fileUpload = bucket.file(`reviews/${fileName}.jpg`);
+            
+            await fileUpload.save(optimizedImageBuffer, {
+                metadata: {
+                    contentType: file.mimetype
+                }
+            });
+            const imageUrl = `https://storage.googleapis.com/${bucket.name}/${fileUpload.name}`;
+
+            console.log("Uploaded to Firebase Storage");
+        }
+        
+        res.redirect('/')
     } catch (error) {
         console.error('Error saving review:', error);
         res.status(500).send('Internal Server Error');
     }
 });
 
-app.delete('/delete-review/:id', async (req, res) => {
+
+app.delete('/delete-review/:id/:imagePresent', async (req, res) => {
     try {
         const reviewId = req.params.id;
+        const imagePresent = req.params.imagePresent;
+
+        // Construct the path to the image in Firebase Storage
+        if(imagePresent === 'true') { 
+            const filePath = `reviews/${reviewId}.jpg`;
+
+            // Create a reference to the file in Firebase Storage
+            const bucket = admin.storage().bucket();
+            const file = bucket.file(filePath);
+
+            // Delete the file from Firebase Storage
+            await file.delete();
+
+            console.log("Deleted from Firebase Storage");
+        }
 
         // Find the review by ID and delete it
         const deletedReview = await Review.findByIdAndDelete(reviewId);
@@ -286,14 +327,14 @@ app.get('/about-me', async (req, res) => {
 app.get('/gallery', async (req, res) => {
     try {
         const allImages = await fetchAndCacheImages();
-        const filteredImages = allImages.filter(image => image.albumName !== 'contact' && image.albumName !== 'about_me');
+        const filteredImages = allImages.filter(image => image.albumName !== 'contact' && image.albumName !== 'about_me' && image.albumName !== 'highlights' && image.albumName !== 'reviews');
         const shuffledImages = shuffleArray(filteredImages);
 
         // Group images by album
         const albumsMap = new Map(); // Using a map to ensure albums are unique
         allImages.forEach(image => {
             const { albumName, imageName } = image;
-            if (albumName !== 'contact' && albumName !== 'about_me') { // Exclude the "contact" album
+            if (albumName !== 'contact' && albumName !== 'about_me' && image.albumName !== 'highlights' && image.albumName !== 'reviews') { // Exclude the "contact" album
                 if (!albumsMap.has(albumName)) {
                     albumsMap.set(albumName, []);
                 }
@@ -348,7 +389,7 @@ app.get('/iamtheowner01-admin-gallery-edit', async (req, res) => {
         const albumsMap = new Map(); // Using a map to ensure albums are unique
         allImages.forEach(image => {
             const { albumName, imageName } = image;
-            if (albumName !== 'contact' && albumName !== 'about_me') { // Exclude the "contact" album
+            if (albumName !== 'contact' && albumName !== 'about_me' && albumName !== 'reviews') { // Exclude the "contact" album
                 if (!albumsMap.has(albumName)) {
                     albumsMap.set(albumName, []);
                 }
@@ -358,13 +399,13 @@ app.get('/iamtheowner01-admin-gallery-edit', async (req, res) => {
 
         const albums = Array.from(albumsMap, ([name, images]) => ({ name, images }));
 
-
+        const reviewImages = allImages.filter(image => image.albumName === 'reviews');
         const contactAlbum = allImages.filter(image => image.albumName === 'contact');
         const aboutMeAlbum = allImages.filter(image => image.albumName === 'about_me');
         
 
         
-        res.render('gallery_edit', { albums, contactAlbum, aboutMeAlbum, adminInfo: res.locals.adminInfo });
+        res.render('gallery_edit', { reviewImages, albums, contactAlbum, aboutMeAlbum, adminInfo: res.locals.adminInfo });
     } catch (error) {
         console.error('Error fetching album images:', error);
         res.status(500).send('Error fetching album images');
