@@ -1,0 +1,43 @@
+<%- include("partials/header") %>
+  <!-- Content -->
+  <div class="">
+    <div class="">
+      <section class="">
+        <div class="">
+          <h1 class="font-signika text-4xl pt-10 pb-8">Add News </h1>
+
+          <form class="space-y-8" action="/add-news/new" method="post" enctype="application/x-www-form-urlencoded">
+            <div>
+              <label for="title"
+                class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Title</label>
+              <input type="text" id="title" value="Title" name="title"
+                class="block p-3 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-neutral-900 dark:border-neutral-800 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 dark:shadow-sm-light"
+                placeholder="" />
+            </div>
+            <div>
+                <label for="imageUrl"
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">ImageURL</label>
+                <input type="url" id="imageUrl" value="ImageUrl" name="imageUrl"
+                  class="block p-3 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-neutral-900 dark:border-neutral-800 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 dark:shadow-sm-light"
+                  placeholder="" />
+              </div>
+            <div class="sm:col-span-2">
+                <textarea id="aboutPhoto" rows="15" name="description" 
+                  class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg shadow-sm border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-neutral-900 dark:border-neutral-800 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  placeholder="description" ></textarea>
+            </div>
+            <button type="submit"
+              class="py-3 px-5 text-sm font-medium text-center bg-black dark:bg-white text-white dark:text-black rounded-lg bg-primary-700 sm:w-fit hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+              Add 
+            </button>
+          </form>
+
+
+        </div>
+      </section>
+      <div class="col-span-2 md:col-span-1 flex relative">
+      </div>
+    </div>
+  </div>
+  <!-- Footer -->
+<%- include("partials/footer") %>
