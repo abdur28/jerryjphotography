@@ -1939,7 +1939,7 @@ video {
 
  .news-image{
   border-radius: 20px;
-  width: 70vh;
+  width: 100%;
   
  }
  .news-description{}
@@ -1948,6 +1948,7 @@ video {
   .news-image-container{
     min-width: 70vh;
     max-height: 50vh;
+    border-radius: 20px;
     /* padding-right: 20px; */
    }
    .news-image{
