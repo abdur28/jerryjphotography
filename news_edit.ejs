@@ -1,0 +1,49 @@
+<%- include("partials/header") %>
+
+<div class="container mx-auto">
+  <h1 class="font-signika text-4xl pt-10 pb-8">NEWS EDIT</h1>
+  <div class="news flex flex-col gap-5">
+    <% if (news && news.length > 0) { %>
+      <% news.forEach(post => { %>
+        <div class="news-card light:second-section dark:second-section flex md:flex-row flex-col relative p-8">
+            <div class="news-image-container aspect-square justify-center items-center flex">
+              <img class="news-image" src="<%=post.imageUrl%>" alt="" onerror="this.onerror=null; this.src='../dist/assets/placeholder.png';">
+            </div>
+            <div class="news-content pt-5  md:pl-10">
+                <h1 class="font-signika text-2xl md:text-4xl"><%=post.title%></h1>
+                <p class="news-description pt-3 md:text-base text-sm"><%=post.description.substring(0, 200) + " ..."%></p>
+                <div class="pt-5 flex gap-3">
+                    <button class="more-button ">
+                        <a href="/iamtheowner01-admin-add-news/<%=post.id%>">
+                          <p class=" md:text-base text-sm">Edit</p>
+                        </a>
+                    </button>
+                    <button class="delete-news" data-id="<%=post.id%>">
+                       
+                          <p class=" md:text-base text-sm">Delete</p>
+                        
+                    </button>
+                </div>
+            </div>
+        </div>
+      <% }); %>
+    <%} else {%>    
+        <div>
+          <h1>No News available</h1>
+        </div>
+    <% }; %>   
+
+
+    <div class="flex flex-row justify-center items-center pt-8">
+        <button class="more-button">
+            <a href="/iamtheowner01-admin-add-news/new">
+              <p class=" md:text-base text-sm">Add News</p>
+            </a>
+        </button>
+    </div>
+   
+  </div>
+
+</div>
+
+<%- include("partials/footer") %>

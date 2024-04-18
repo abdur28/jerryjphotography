@@ -1,0 +1,34 @@
+<%- include("partials/header") %>
+  <!-- Content -->
+  <div class="container mx-auto">
+    <h1 class="font-signika text-4xl pt-10 pb-8">NEWS</h1>
+    <div class="grid grid-cols-2 gap-14 md:gap-20">
+      <div class="col-span-2 md:col-span-1">
+        <div
+          class="bg-white dark:bg-neutral-900 p-5  m-6 md:m-12 shadow-lg border border-gray-100 dark:border-neutral-800  transition duration-500 relative">
+          <img src="<%= post.imageUrl %>" alt=""
+            onerror="this.onerror=null; this.src='../dist/assets/placeholder.png';"
+            class="smooth-edges flex flex-col w-full object-cover h-auto" />
+        </div>
+      </div>
+      <section class="font-normal text-center text-base md:text-start mx-3 col-span-2 md:col-span-1 my-auto">
+        <div class="block md:hidden">
+          <p class="text-3xl font-serif font-bold mb-6"><%= post.title %></p>
+        </div>
+        <p class="hidden md:block text-3xl font-serif font-bold mb-6"><%= post.title %></p>
+        
+        <% 
+        const paragraphs = post.description.split('\n');
+        
+        // Iterate over each paragraph and render it
+        paragraphs.forEach(paragraph => { %>
+          <p class="mb-4">
+            <%= paragraph %>
+          </p>
+       <% }); %>
+        
+      </section>
+    </div>
+  </div>
+  <!-- Footer -->
+<%- include("partials/footer") %>
