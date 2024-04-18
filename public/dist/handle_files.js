@@ -22,6 +22,32 @@ document.querySelectorAll('.edit-delete-button').forEach(button => {
   });
 });
 
+document.querySelectorAll('.delete-news').forEach(button => {
+  button.addEventListener('click', async () => {
+      const postId = button.dataset.id;
+      // Confirm deletion with the user
+      const confirmation = confirm('Are you sure you want to delete this post?');
+      if (!confirmation) return; // If user cancels, do nothing
+
+
+      try {
+          const response = await fetch(`/delete/news/${postId}`, {
+              method: 'DELETE'
+          });
+          if (response.ok) {
+            // Image deleted successfully
+            alert('Post deleted successfully');
+            window.location.reload(true);
+          } else {
+            // Failed to delete image
+            alert('Failed to delete post. Please try again later.');
+          }
+      } catch (error) {
+          console.error('Error deleting post:', error);
+      }
+  });
+});
+
 document.addEventListener('DOMContentLoaded', function () {
   const addReviewImgBtn = document.getElementById('add-review-img');
   const fileInput = document.querySelector('.reviewFileInput');
