@@ -1933,6 +1933,7 @@ video {
 
  .news-image-container{
   max-height: 30vh;
+  min-width: 100%;
   overflow: hidden;
   border-radius: 20px;
  }
