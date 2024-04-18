@@ -159,8 +159,15 @@ const reviewSchema = new mongoose.Schema({
     review: String,
 });
 
+const newsSchema = new mongoose.Schema({
+    title: String,
+    imageUrl: String,
+    description: String,
+})
+
 const Information = mongoose.model('Information', informationSchema);
 const Review = mongoose.model('Review', reviewSchema);
+const News = mongoose.model('News', newsSchema);
 
 
 
@@ -168,8 +175,10 @@ const fetchAdminInfo = async (req, res, next) => {
     try {
         const adminInfo = await Information.findOne();
         const reviews = await Review.find();
+        const news = await News.find();
         res.locals.reviews = reviews;
         res.locals.adminInfo = adminInfo;
+        res.locals.news = news;
         next();
     } catch (error) {
         console.error('Error fetching admin information:', error);
@@ -189,6 +198,7 @@ function shuffleArray(array) {
 
 app.get('/', async (req, res) => {
     try {
+        await redisClient.flushDb()
         const allImages = await fetchAndCacheImages();
         const filteredImages = allImages.filter(image => image.albumName === 'highlights');
         const reviewImages = allImages.filter(image => image.albumName === 'reviews');
@@ -244,7 +254,6 @@ app.post('/', upload.single('file'), async (req, res) => {
     }
 });
 
-
 app.delete('/delete-review/:id/:imagePresent', async (req, res) => {
     try {
         const reviewId = req.params.id;
@@ -278,6 +287,26 @@ app.delete('/delete-review/:id/:imagePresent', async (req, res) => {
     }
 });
 
+app.get('/news', async (req, res) => {
+    try {
+        res.render('news', {news: res.locals.news});
+    } catch (error) {
+        console.error('Error fetching images:', error);
+        res.status(500).send('Error fetching images');
+    }
+});
+
+app.get('/news/:id', async (req, res) => {
+    try {
+        const postId = req.params.id
+        const {news} = res.locals
+        const singlePost = news.filter(post => post.id === postId)[0];
+        res.render('single_news', {post: singlePost});
+    } catch (error) {
+        console.error('Error fetching images:', error);
+        res.status(500).send('Error fetching images');
+    }
+});
 
 app.get('/contact', async (req, res) => {
     try {
@@ -377,6 +406,88 @@ app.post('/iamtheowner01-admin', async (req, res) => {
         res.redirect('/')
     } catch (error) {
         console.error('Error updating admin information:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.get('/iamtheowner01-admin-news-edit', async (req, res) => {
+    try {
+        res.render('news_edit', {news: res.locals.news});
+    } catch (error) {
+        console.error('Error fetching images:', error);
+        res.status(500).send('Error fetching images');
+    }
+});
+
+app.get('/iamtheowner01-admin-add-news/:id', async (req, res) => {
+    try {
+        const id = req.params.id
+        console.log(id)
+        if (id !== "new"){
+            const singleNews = await News.findById(id)
+            res.render('edit_news', {post: singleNews});
+        } else {
+            res.render('add_news')
+        }
+        
+    } catch (error) {
+        console.error('Error fetching images:', error);
+        res.status(500).send('Error fetching images');
+    }
+});
+
+app.delete('/delete/news/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+
+        // Find the review by ID and delete it
+        const deletedPost = await News.findByIdAndDelete(id);
+
+        if (!deletedPost) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+        // Respond with a success message
+        res.status(200).json({ message: 'Post deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting post:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+app.post('/edit-news/:id', async (req, res) => {
+    try {
+        const { title, imageUrl, description} = req.body;
+        const id = req.params.id
+        const singleNews = await News.findById(id);
+
+        singleNews.title = title.trim() || singleNews.title;
+        singleNews.imageUrl = imageUrl.trim() || singleNews.imageUrl;
+        singleNews.description = description.trim() || singleNews.description;
+
+
+        await singleNews.save();
+
+        res.redirect('/news')
+    } catch (error) {
+        console.error('Error updating admin information:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.post('/add-news/new', upload.single('file'), async (req, res) => {
+    try {
+        const { title, description, imageUrl} = req.body;
+        const newPost = new News({
+            title: title,
+            imageUrl: imageUrl,
+            description: description
+        });
+
+        await newPost.save();
+
+        res.redirect('/news')
+    } catch (error) {
+        console.error('Error adding news:', error);
         res.status(500).send('Internal Server Error');
     }
 });
