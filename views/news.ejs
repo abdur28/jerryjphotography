@@ -5,9 +5,10 @@
   <div class="news flex flex-col gap-5">
   <% if (news && news.length > 0) { %>
     <% news.forEach(post => { %>
+    <% const mainImage = images.find(image => image.imageName === (post.id + '_main.jpg')) || ''; %>   
     <div class="news-card light:second-section dark:second-section flex md:flex-row flex-col relative p-8">
-        <div class="news-image-container aspect-square justify-center items-center flex">
-            <img class="news-image" src="<%=post.imageUrl%>" alt="" onerror="this.onerror=null; this.src='../dist/assets/placeholder.png';">
+        <div class="news-image-container md:aspect-square justify-center items-center flex">
+            <img class="news-image" src="<%=mainImage.imageUrl%>" alt="" onerror="this.onerror=null; this.src='../dist/assets/placeholder.png';">
         </div>
         <div class="news-content pt-5  md:pl-10">
             <h1 class="font-signika text-2xl md:text-4xl"><%=post.title %></h1>
