@@ -1994,3 +1994,13 @@ video {
   border: 1.2px solid #070707;
   background-color: #ff000070;
 }
+
+.optional-image{
+  width: 32%;
+}
+
+@media (min-width: 760px) {
+  .optional-image{
+    width: 19%
+  }
+ }
