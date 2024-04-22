@@ -161,7 +161,6 @@ const reviewSchema = new mongoose.Schema({
 
 const newsSchema = new mongoose.Schema({
     title: String,
-    imageUrl: String,
     description: String,
 })
 
@@ -196,9 +195,9 @@ function shuffleArray(array) {
     return array;
   }
 
+//home route and reviews
 app.get('/', async (req, res) => {
     try {
-        await redisClient.flushDb()
         const allImages = await fetchAndCacheImages();
         const filteredImages = allImages.filter(image => image.albumName === 'highlights');
         const reviewImages = allImages.filter(image => image.albumName === 'reviews');
@@ -287,9 +286,13 @@ app.delete('/delete-review/:id/:imagePresent', async (req, res) => {
     }
 });
 
+
+//news route
 app.get('/news', async (req, res) => {
     try {
-        res.render('news', {news: res.locals.news});
+        const allImages = await fetchAndCacheImages();
+        const filteredImages = allImages.filter(image => image.albumName === 'news');
+        res.render('news', {images: filteredImages, news: res.locals.news});
     } catch (error) {
         console.error('Error fetching images:', error);
         res.status(500).send('Error fetching images');
@@ -301,13 +304,17 @@ app.get('/news/:id', async (req, res) => {
         const postId = req.params.id
         const {news} = res.locals
         const singlePost = news.filter(post => post.id === postId)[0];
-        res.render('single_news', {post: singlePost});
+        const allImages = await fetchAndCacheImages();
+        const filteredImages = allImages.filter(image => image.imageName.startsWith(postId));
+        res.render('single_news', {post: singlePost, images: filteredImages});
     } catch (error) {
         console.error('Error fetching images:', error);
         res.status(500).send('Error fetching images');
     }
 });
 
+
+//contact route
 app.get('/contact', async (req, res) => {
     try {
         const allImages = await fetchAndCacheImages();
@@ -342,6 +349,7 @@ app.post('/contact', (req, res) => {
     });
 });
 
+//about me route
 app.get('/about-me', async (req, res) => {
     try {
         const allImages = await fetchAndCacheImages();
@@ -353,17 +361,18 @@ app.get('/about-me', async (req, res) => {
     }
 });
 
+//gallery route
 app.get('/gallery', async (req, res) => {
     try {
         const allImages = await fetchAndCacheImages();
-        const filteredImages = allImages.filter(image => image.albumName !== 'contact' && image.albumName !== 'about_me' && image.albumName !== 'highlights' && image.albumName !== 'reviews');
+        const filteredImages = allImages.filter(image => image.albumName !== 'contact' && image.albumName !== 'about_me' && image.albumName !== 'highlights' && image.albumName !== 'reviews' && image.albumName !== 'news');
         const shuffledImages = shuffleArray(filteredImages);
 
         // Group images by album
         const albumsMap = new Map(); // Using a map to ensure albums are unique
         allImages.forEach(image => {
             const { albumName, imageName } = image;
-            if (albumName !== 'contact' && albumName !== 'about_me' && image.albumName !== 'highlights' && image.albumName !== 'reviews') { // Exclude the "contact" album
+            if (albumName !== 'contact' && albumName !== 'about_me' && image.albumName !== 'highlights' && image.albumName !== 'reviews' && image.albumName !== 'news') { // Exclude the "contact" album
                 if (!albumsMap.has(albumName)) {
                     albumsMap.set(albumName, []);
                 }
@@ -380,7 +389,7 @@ app.get('/gallery', async (req, res) => {
     }
 });
 
-
+//admin routes
 app.get('/iamtheowner01-admin', function (req, res) {
     res.render('admin', { adminInfo: res.locals.adminInfo });
 });
@@ -412,7 +421,9 @@ app.post('/iamtheowner01-admin', async (req, res) => {
 
 app.get('/iamtheowner01-admin-news-edit', async (req, res) => {
     try {
-        res.render('news_edit', {news: res.locals.news});
+        const allImages = await fetchAndCacheImages();
+        const filteredImages = allImages.filter(image => image.albumName === 'news');
+        res.render('news_edit', {news: res.locals.news, images: filteredImages});
     } catch (error) {
         console.error('Error fetching images:', error);
         res.status(500).send('Error fetching images');
@@ -422,10 +433,11 @@ app.get('/iamtheowner01-admin-news-edit', async (req, res) => {
 app.get('/iamtheowner01-admin-add-news/:id', async (req, res) => {
     try {
         const id = req.params.id
-        console.log(id)
+        const allImages = await fetchAndCacheImages();
+        const filteredImages = allImages.filter(image => image.imageName.startsWith(id));
         if (id !== "new"){
             const singleNews = await News.findById(id)
-            res.render('edit_news', {post: singleNews});
+            res.render('edit_news', {post: singleNews, images: filteredImages});
         } else {
             res.render('add_news')
         }
@@ -439,6 +451,26 @@ app.get('/iamtheowner01-admin-add-news/:id', async (req, res) => {
 app.delete('/delete/news/:id', async (req, res) => {
     try {
         const id = req.params.id;
+        const allImages = await fetchAndCacheImages();
+        const filteredImages = allImages.filter(image => image.imageName.startsWith(id));
+
+        // Construct the path to the image in Firebase Storage
+        if (filteredImages.length > 0) {
+            // Use Promise.all to delete all files asynchronously
+            await Promise.all(filteredImages.map(async (image) => {
+                const filePath = `news/${image.imageName}`;
+
+                // Create a reference to the file in Firebase Storage
+                const bucket = admin.storage().bucket();
+                const file = bucket.file(filePath);
+
+                // Delete the file from Firebase Storage
+                await file.delete();
+            }));
+            console.log("Deleted from Firebase Storage");
+        } else {
+            console.log('no images')
+        }
 
         // Find the review by ID and delete it
         const deletedPost = await News.findByIdAndDelete(id);
@@ -456,12 +488,11 @@ app.delete('/delete/news/:id', async (req, res) => {
 
 app.post('/edit-news/:id', async (req, res) => {
     try {
-        const { title, imageUrl, description} = req.body;
+        const { title,  description} = req.body;
         const id = req.params.id
         const singleNews = await News.findById(id);
 
         singleNews.title = title.trim() || singleNews.title;
-        singleNews.imageUrl = imageUrl.trim() || singleNews.imageUrl;
         singleNews.description = description.trim() || singleNews.description;
 
 
@@ -474,20 +505,72 @@ app.post('/edit-news/:id', async (req, res) => {
     }
 });
 
-app.post('/add-news/new', upload.single('file'), async (req, res) => {
+app.post('/add-news/new', upload.any(), async (req, res) => {
     try {
-        const { title, description, imageUrl} = req.body;
+        const { title, description } = req.body;
+        const mainFile = req.files.find(file => file.fieldname === 'mainFile');
+        const optionalFiles = req.files.filter(file => file.fieldname.startsWith('optionalFile'));
         const newPost = new News({
             title: title,
-            imageUrl: imageUrl,
             description: description
         });
 
-        await newPost.save();
+        const savedNews = await newPost.save();
 
-        res.redirect('/news')
+
+        const files = req.files;
+        if (!files) {
+            return res.redirect('/news');
+        }
+
+        if (savedNews.id){
+            let folderName = savedNews.id;
+            // Resize and optimize image with quality 90 using Sharp
+            if (mainFile) {
+                const file = mainFile
+                const optimizedImageBuffer = await sharp(file.buffer)
+                .jpeg({ quality: 90 })
+                .toBuffer();
+
+                // Upload the image to Firebase Storage
+                const bucket = admin.storage().bucket();
+                const fileUpload = bucket.file(`news/${folderName}_main.jpg`);
+                
+                await fileUpload.save(optimizedImageBuffer, {
+                    metadata: {
+                        contentType: file.mimetype
+                    }
+                });
+                const imageUrl = `https://storage.googleapis.com/${bucket.name}/${fileUpload.name}`;
+            }
+
+            if (optionalFiles) {
+                for (let i = 0; i < optionalFiles.length; i++) {
+                    const file = optionalFiles[i];
+                    const optimizedImageBuffer = await sharp(file.buffer)
+                    .jpeg({ quality: 90 })
+                    .toBuffer();
+
+                    // Upload the image to Firebase Storage
+                    const bucket = admin.storage().bucket();
+                    const fileUpload = bucket.file(`news/${folderName}_optional${i}.jpg`);
+                    
+                    await fileUpload.save(optimizedImageBuffer, {
+                        metadata: {
+                            contentType: file.mimetype
+                        }
+                    });
+                    const imageUrl = `https://storage.googleapis.com/${bucket.name}/${fileUpload.name}`;
+                }
+            }
+            
+
+            console.log("Uploaded to Firebase Storage");
+        }
+        await redisClient.flushDb();
+        res.redirect('/')
     } catch (error) {
-        console.error('Error adding news:', error);
+        console.error('Error saving review:', error);
         res.status(500).send('Internal Server Error');
     }
 });
@@ -500,7 +583,7 @@ app.get('/iamtheowner01-admin-gallery-edit', async (req, res) => {
         const albumsMap = new Map(); // Using a map to ensure albums are unique
         allImages.forEach(image => {
             const { albumName, imageName } = image;
-            if (albumName !== 'contact' && albumName !== 'about_me' && albumName !== 'reviews') { // Exclude the "contact" album
+            if (albumName !== 'contact' && albumName !== 'about_me' && albumName !== 'reviews' && image.albumName !== 'news') { // Exclude the "contact" album
                 if (!albumsMap.has(albumName)) {
                     albumsMap.set(albumName, []);
                 }
@@ -547,7 +630,6 @@ app.delete('/delete-image/:album/:imageName', async (req, res) => {
 });
 
 
-// Upload image to S3 bucket and associate it with an album
 app.put('/add-image', upload.single('image'), async (req, res) => {
     try {
         const album = req.body.album;
@@ -601,5 +683,3 @@ connectDB().then(() => {
         console.log("listening for requests");
     });
 });
-
-
