@@ -25,7 +25,7 @@
               <div class="my-image flex-grow p-2">
                 <a href="<%= image.url %>" data-fancybox="<%= album.name %>">
                   <div class="loader-container"><div class="loader"></div></div>
-                  <img loading="lazy" alt="" class="hidden image-loading all-images border-radius block h-full w-full object-cover object-center opacity-0 animate-fade-in transition duration-500 transform scale-100 hover:scale-110" src="<%= image.url %>" onload="imageLoaded(this)" />
+                  <img loading="lazy" alt="" class="hidden image-loading all-images border-radius h-full w-full object-cover object-center opacity-0 animate-fade-in transition duration-500 transform scale-100 hover:scale-110" src="<%= image.url %>" onload="imageLoaded(this)" />
                 </a>
               </div>
             <% }); %>
@@ -44,7 +44,7 @@
               <div class="my-image flex-grow p-2">
                 <a href="<%= image.imageUrl%>" data-fancybox="all">
                   <div class="loader-container"><div class="loader"></div></div>
-                  <img alt="" class="hidden all-images image-loading border-radius block h-full w-full object-cover object-center opacity-0 animate-fade-in transition duration-500 transform scale-100 hover:scale-110" src="<%= image.imageUrl %>" onload="imageLoaded(this)" />
+                  <img alt="" class="hidden all-images image-loading border-radius h-full w-full object-cover object-center opacity-0 animate-fade-in transition duration-500 transform scale-100 hover:scale-110" src="<%= image.imageUrl %>" onload="imageLoaded(this)" />
                 </a>
               </div>
               <% }) %>
