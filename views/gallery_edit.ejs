@@ -57,39 +57,10 @@
     </section>
   <% }) %>
 
-  <section id="reviews" class="relative flex flex-col overflow-hidden mt-20 pb-10 sliding-section">
-      <h1 class="font-signika text-2xl md:text-4xl pb-10">Reviews</h1>
-      <div class="flex overflow-x-auto">
-          <div class="flex space-x-10 pb-4 mr-4 ml-2">
-              <% reviews.forEach((review) => { %>
-                <div class="card flex flex-col justify-between">
-                  <button class="ml-40 delete-review  top-0 right-0 bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-600 transition duration-300" onclick="deleteReview('<%= review.name %>')" data-review-id="<%= review._id %>">X</button>
-                  <div class="review-img-container justify-center">
-                      <% const reviewImage = reviewImages.find(image => image.imageName === (review.id + '.jpg')); %>
-                      <% if (reviewImage) { %>
-                        <input id="reviewImg" type="hidden" class="ImagePresent" value="true">
-                        <img class="review-img" src="<%= reviewImage.imageUrl %>" alt="review image">
-                      <% } else { %>
-                        <input id="reviewImg" type="hidden" class="ImagePresent" value="false">
-                        <img class="review-img" src="../dist/assets/user-placeholder.png" alt="placeholder image">
-                      <% } %>
-                  </div>
-                  <p class='tracking-wider text-xs mt-1 overflow-hidden'>"<%= review.review %>"</p>
-                  <div class='mt-1'>
-                      <p class='font-medium text-sm mb-auto'>
-                          <span class='blue-text-gradient' style="color: rgb(51, 51, 218);"><i>@</i></span> <%= review.name %>
-                      </p>
-                  </div>
-                </div>
-              <% }) %>
-          </div>
-      </div>
-  </section>
-
   <div class="add-button-container flex flex-col">
     <h1 class="text-3xl pt-10 pb-8 pr-8 flex-col">Add Ablum:</h1> 
     <div class="flex flex-row">
-      <input type="text" class="albumName" style="background-color: gray; border-radius: 10px;" value=""> 
+      <input type="text" class="albumName block p-3 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-neutral-900 dark:border-neutral-800 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 dark:shadow-sm-light" value=""> 
       <input type="file" class="fileInput" accept="image/*" style="display: none;">
       <button class="add-button uploadButton">
         <svg class="h-16 w-16 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -97,10 +68,38 @@
         </svg>   
       </button>
     </div>
-    
     <!-- Hidden input to store the album name -->
-    
   </div>
+
+  <section id="reviews" class="relative flex flex-col overflow-hidden mt-20 pb-10 sliding-section">
+    <h1 class="font-signika text-2xl md:text-4xl pb-10">Reviews</h1>
+    <div class="flex overflow-x-auto">
+        <div class="flex space-x-10 pb-4 mr-4 ml-2">
+            <% reviews.forEach((review) => { %>
+              <div class="card flex flex-col justify-between">
+                <button class="ml-40 delete-review  top-0 right-0 bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-600 transition duration-300" onclick="deleteReview('<%= review.name %>')" data-review-id="<%= review._id %>">X</button>
+                <div class="review-img-container justify-center">
+                    <% const reviewImage = reviewImages.find(image => image.imageName === (review.id + '.jpg')); %>
+                    <% if (reviewImage) { %>
+                      <input id="reviewImg" type="hidden" class="ImagePresent" value="true">
+                      <img class="review-img" src="<%= reviewImage.imageUrl %>" alt="review image">
+                    <% } else { %>
+                      <input id="reviewImg" type="hidden" class="ImagePresent" value="false">
+                      <img class="review-img" src="../dist/assets/user-placeholder.png" alt="placeholder image">
+                    <% } %>
+                </div>
+                <p class='tracking-wider text-xs mt-1 overflow-hidden'>"<%= review.review %>"</p>
+                <div class='mt-1'>
+                    <p class='font-medium text-sm mb-auto'>
+                        <span class='blue-text-gradient' style="color: rgb(51, 51, 218);"><i>@</i></span> <%= review.name %>
+                    </p>
+                </div>
+              </div>
+            <% }) %>
+        </div>
+      </div>
+  </section>
+
   
 <!-- Footer -->
 <%- include("partials/footer") %>
