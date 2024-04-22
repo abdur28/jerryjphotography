@@ -1,3 +1,4 @@
+//delete gallery images
 document.querySelectorAll('.edit-delete-button').forEach(button => {
   button.addEventListener('click', async () => {
       const albumName = button.dataset.albumName;
@@ -22,6 +23,7 @@ document.querySelectorAll('.edit-delete-button').forEach(button => {
   });
 });
 
+//delete news
 document.querySelectorAll('.delete-news').forEach(button => {
   button.addEventListener('click', async () => {
       const postId = button.dataset.id;
@@ -48,6 +50,7 @@ document.querySelectorAll('.delete-news').forEach(button => {
   });
 });
 
+//add review
 document.addEventListener('DOMContentLoaded', function () {
   const addReviewImgBtn = document.getElementById('add-review-img');
   const fileInput = document.querySelector('.reviewFileInput');
@@ -115,8 +118,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
-
-
+//delete review
 document.addEventListener('DOMContentLoaded', function() {
   // Add event listener to all delete buttons
   const deleteButtons = document.querySelectorAll('.delete-review');
@@ -149,10 +151,142 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+//add news
+document.addEventListener('DOMContentLoaded', function () {
+  const addMainImg = document.getElementById('add-main-img');
+  const fileInputMain = document.querySelector('.fileInputMain');
+  const newsImgMain = document.querySelector('.news-img-main');
+  const newsForm = document.getElementById('newsForm');
 
+  const addOptionalImg = document.getElementById('add-optional-img');
+  const fileInputOptional = document.querySelector('.fileInputOptional');
+  const imageGallery = document.querySelector('.image-gallery-edit');
 
+  const allOptionalFile = [];
 
+  // Function to handle main file input change
+  fileInputMain.addEventListener('change', function () {
+    const file = this.files[0];
 
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        newsImgMain.src = e.target.result;
+      };
+
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Function to handle click on add main image button
+  addMainImg.addEventListener('click', function () {
+    fileInputMain.click();
+  });
+
+  // Function to handle optional file input change
+  fileInputOptional.addEventListener('change', function () {
+    const files = this.files;
+
+    if (files.length > 0) {
+      for (const file of files) {
+        allOptionalFile.push(file);
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          const galleryEditItem = document.createElement('div');
+          galleryEditItem.classList.add('gallery-edit-item');
+
+          const imageEditContainer = document.createElement('div');
+          imageEditContainer.classList.add('image-edit-container');
+
+          const img = document.createElement('img');
+          img.classList.add('thumbnail');
+          img.src = e.target.result;
+
+          const deleteButton = document.createElement('button');
+          deleteButton.classList.add('edit-delete-button');
+          deleteButton.textContent = 'x';
+
+          // Function to handle click on delete button
+          deleteButton.addEventListener('click', function () {
+            // Remove the file from the list
+            const index = allOptionalFile.indexOf(file);
+            if (index !== -1) {
+              allOptionalFile.splice(index, 1);
+            }
+
+            // Remove the image item div
+            imageGallery.removeChild(galleryEditItem);
+          });
+
+          imageEditContainer.appendChild(img);
+          imageEditContainer.appendChild(deleteButton);
+          galleryEditItem.appendChild(imageEditContainer);
+
+          imageGallery.appendChild(galleryEditItem);
+        };
+
+        reader.readAsDataURL(file);
+      }
+    }
+  });
+
+  // Function to handle click on add optional image button
+  addOptionalImg.addEventListener('click', function () {
+    fileInputOptional.click();
+  });
+
+  newsForm.addEventListener('submit', async function (event) {
+    event.preventDefault();
+
+    // Retrieve name and review from form inputs
+    const title = document.getElementById('title').value;
+    const description = document.getElementById('description').value;
+    const mainFile = fileInputMain.files[0];
+    const optionalFiles = allOptionalFile;
+
+    // console.log(mainFile, optionalFiles);
+
+    const formData = new FormData();
+    if (mainFile) {
+      formData.append("mainFile", mainFile);
+    }
+    if (optionalFiles.length > 0) {
+      optionalFiles.forEach((file, index) => {
+        formData.append(`optionalFile${index}`, file);
+      });
+    }
+    formData.append("title", title);
+    formData.append("description", description);
+
+    // Change the submit button text to "Submitting..."
+    const submitButton = newsForm.querySelector('button[type="submit"]');
+    submitButton.textContent = 'Please Wait. Uploading...';
+
+    try {
+      const response = await fetch('/add-news/new', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        console.log('News submitted successfully');
+        alert('New News added.');
+        window.location.reload();
+      } else {
+        console.error('Failed to upload news');
+      }
+    } catch (error) {
+      console.error('Error uploading news:', error);
+    } finally {
+      // Revert the submit button text back to "Submit Review"
+      submitButton.textContent = 'Add';
+    }
+  });
+});
+
+//add gallery images
 document.addEventListener('DOMContentLoaded', function() {
     // Add event listener to all upload buttons
   const uploadButtons = document.querySelectorAll('.uploadButton');
@@ -216,6 +350,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+
 
 function resizeOrUseOriginalImage(file) {
   return new Promise((resolve, reject) => {
