@@ -5,33 +5,71 @@
       <section class="">
         <div class="">
           <h1 class="font-signika text-4xl pt-10 pb-8">Edit News </h1>
+          <div class="grid grid-cols-2 gap-14 md:gap-20">
+            <div class="col-span-2 md:col-span-1">
+              <div
+                class="bg-white dark:bg-neutral-900 p-5 mb-0 m-12 md:m-20 shadow-lg border border-gray-100 dark:border-neutral-800  transition duration-500 relative">
+                <% const mainImage = images[0] ? images[0].imageUrl : '' %>
+                <img src="<%=mainImage%>" alt="" class="news-img-main"
+                  onerror="this.onerror=null; this.src='../dist/assets/placeholder.png';"
+                  class="smooth-edges flex flex-col w-full object-cover h-auto" />
+              </div>
+            </div>
+            <!-- <div class="font-normal text-center text-base md:text-start mx-3 col-span-2 md:col-span-1 my-auto ">
+              <div class="add-button-container">
+                <input type="file" class="fileInputMain" accept="image/*" style="display: none;">
+                <button class="add-button" id="add-main-img">
+                  <svg class="h-16 w-16 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                  </svg>   
+                </button>
+              </div>
+            </div> -->
+          </div>  
 
-          <form class="space-y-8" action="/edit-news/<%=post.id%>" method="post" enctype="application/x-www-form-urlencoded">
+          <form id="newsForm" class="space-y-8" action="/edit-news/<%=post.id%>" method="post" enctype="application/x-www-form-urlencoded">
             <div>
               <label for="title"
-                class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"><%=post.title%></label>
-              <input type="text" id="title" value="<%=post.title%>" name="title"
+                class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Title</label>
+              <input type="text" id="title" value="<%=post.title%>" name="title" required
                 class="block p-3 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-neutral-900 dark:border-neutral-800 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 dark:shadow-sm-light"
                 placeholder="" />
             </div>
-            <div>
-                <label for="imageUrl"
-                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">ImageURL</label>
-                <input type="url" id="imageUrl" value="<%=post.imageUrl%>" name="imageUrl"
-                  class="block p-3 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-neutral-900 dark:border-neutral-800 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 dark:shadow-sm-light"
-                  placeholder="" />
-              </div>
             <div class="sm:col-span-2">
-                <textarea id="aboutPhoto" rows="15" name="description" 
+                <textarea id="description" rows="15" name="description" required
                   class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg shadow-sm border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-neutral-900 dark:border-neutral-800 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                   placeholder="<%=post.description%>" ></textarea>
             </div>
+
+            <div class="pb-10">
+              <h1 class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Optional Picture</h1>
+              <section class="image-gallery-edit nature-section pt-10">
+                <% if (images.length>2) { %>
+                  <% for (let i = 1; i < images.length; i++) { %>
+                    <div class="gallery-edit-item">
+                      <div class="image-edit-container">
+                        <img alt="" class="thumbnail" src="<%=images[i].imageUrl%>" />
+                        <!-- <button class="edit-delete-button">x</button> -->
+                      </div>
+                    </div>
+                  <% } %>
+                <% } %>
+                <!-- <div class="add-button-container">
+                  <input type="file" class="fileInputOptional" accept="image/*" multiple style="display: none;">
+                  <button type="button" id="add-optional-img" data-delete-all="true" class="add-button">
+                    <svg class="h-16 w-16 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>   
+                  </button>
+                </div> -->
+              </section>
+            </div>
+
             <button type="submit"
               class="py-3 px-5 text-sm font-medium text-center bg-black dark:bg-white text-white dark:text-black rounded-lg bg-primary-700 sm:w-fit hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-              Edit
+              Update
             </button>
           </form>
-
 
         </div>
       </section>
